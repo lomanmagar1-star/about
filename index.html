@@ -5,7 +5,6 @@
   <meta charset="UTF-8">
   <meta name="viewport"
         content="width=device-width, initial-scale=1.0">
-
   <title>Man Popup</title>
 
   <style>
@@ -19,6 +18,7 @@
       height: 500vh;
     }
 
+    /* About text */
     .about-button {
       position: fixed;
       top: calc(100vh - 45px);
@@ -35,77 +35,27 @@
       z-index: 10;
     }
 
-    /* Stick figure container */
+    /* Large stick figure on the left */
     .stick-figure {
       position: fixed;
-      top: 125px;
-      left: 70px;
-      width: 100px;
-      height: 160px;
+      top: 25vh;
+      left: 5%;
+
+      width: 35vw;
+      height: 50vh;
+
       opacity: 0;
-      transform: translateY(25px);
-      transition: opacity 0.8s ease,
-                  transform 0.8s ease;
+      transition: opacity 1s ease;
       pointer-events: none;
     }
 
     .stick-figure.visible {
       opacity: 1;
-      transform: translateY(0);
     }
 
     .stick-figure svg {
       width: 100%;
       height: 100%;
-      overflow: visible;
-    }
-
-    /* Walking movement */
-    .arm-left {
-      transform-origin: 50px 65px;
-      animation: leftArm 1s ease-in-out infinite alternate;
-    }
-
-    .arm-right {
-      transform-origin: 50px 65px;
-      animation: rightArm 1s ease-in-out infinite alternate;
-    }
-
-    .leg-left {
-      transform-origin: 50px 100px;
-      animation: leftLeg 1s ease-in-out infinite alternate;
-    }
-
-    .leg-right {
-      transform-origin: 50px 100px;
-      animation: rightLeg 1s ease-in-out infinite alternate;
-    }
-
-    @keyframes leftArm {
-      from { transform: rotate(-25deg); }
-      to   { transform: rotate(25deg); }
-    }
-
-    @keyframes rightArm {
-      from { transform: rotate(25deg); }
-      to   { transform: rotate(-25deg); }
-    }
-
-    @keyframes leftLeg {
-      from { transform: rotate(20deg); }
-      to   { transform: rotate(-20deg); }
-    }
-
-    @keyframes rightLeg {
-      from { transform: rotate(-20deg); }
-      to   { transform: rotate(20deg); }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .arm-left, .arm-right,
-      .leg-left, .leg-right {
-        animation: none;
-      }
     }
   </style>
 </head>
@@ -116,56 +66,52 @@
     About
   </button>
 
-  <!-- Animated stick figure -->
+  <!-- Large stationary stick figure -->
   <div class="stick-figure" id="stickFigure">
-    <svg viewBox="0 0 100 160"
-         xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 200 400"
+         xmlns="http://www.w3.org/2000/svg"
+         preserveAspectRatio="xMidYMid meet">
 
       <!-- Head -->
-      <circle cx="50" cy="25" r="16"
+      <circle cx="100" cy="55" r="40"
               fill="none"
               stroke="black"
-              stroke-width="3"/>
+              stroke-width="5"/>
 
       <!-- Body -->
-      <line x1="50" y1="41"
-            x2="50" y2="100"
+      <line x1="100" y1="95"
+            x2="100" y2="245"
             stroke="black"
-            stroke-width="3"
+            stroke-width="5"
             stroke-linecap="round"/>
 
       <!-- Left arm -->
-      <line class="arm-left"
-            x1="50" y1="65"
-            x2="25" y2="90"
+      <line x1="100" y1="140"
+            x2="30" y2="220"
             stroke="black"
-            stroke-width="3"
+            stroke-width="5"
             stroke-linecap="round"/>
 
       <!-- Right arm -->
-      <line class="arm-right"
-            x1="50" y1="65"
-            x2="75" y2="90"
+      <line x1="100" y1="140"
+            x2="170" y2="220"
             stroke="black"
-            stroke-width="3"
+            stroke-width="5"
             stroke-linecap="round"/>
 
       <!-- Left leg -->
-      <line class="leg-left"
-            x1="50" y1="100"
-            x2="30" y2="145"
+      <line x1="100" y1="245"
+            x2="40" y2="380"
             stroke="black"
-            stroke-width="3"
+            stroke-width="5"
             stroke-linecap="round"/>
 
       <!-- Right leg -->
-      <line class="leg-right"
-            x1="50" y1="100"
-            x2="70" y2="145"
+      <line x1="100" y1="245"
+            x2="160" y2="380"
             stroke="black"
-            stroke-width="3"
+            stroke-width="5"
             stroke-linecap="round"/>
-
     </svg>
   </div>
 
@@ -193,23 +139,22 @@
       currentProgress +=
         (targetProgress - currentProgress) * 0.04;
 
-      // About moves bottom to top
+      // Vertical movement
       const startY = window.innerHeight - 45;
       const endY = 45;
 
       const y =
         startY + (endY - startY) * currentProgress;
 
-      // About moves toward far left
+      // Horizontal movement
       const startX =
         window.innerWidth * 0.375 - 25;
-
       const endX = 45;
 
       const x =
         startX + (endX - startX) * currentProgress;
 
-      // Text grows gradually
+      // Font size increase
       const fontSize =
         18 + 30 * currentProgress;
 
@@ -220,7 +165,7 @@
       about.style.transform =
         `translateX(${-50 * (1 - currentProgress)}%)`;
 
-      // Show figure near the end of scrolling
+      // Show stick figure near the top
       if (currentProgress > 0.97) {
         stickFigure.classList.add("visible");
       } else {
