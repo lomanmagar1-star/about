@@ -12,13 +12,13 @@
       margin: 0;
       background: white;
       font-family: Arial, sans-serif;
+      overflow-x: hidden;
     }
 
     .scroll-space {
-      height: 500vh;
+      height: 600vh;
     }
 
-    /* About text */
     .about-button {
       position: fixed;
       top: calc(100vh - 45px);
@@ -35,27 +35,34 @@
       z-index: 10;
     }
 
-    /* Large stick figure on the left */
+    /* Figure stays on the left */
     .stick-figure {
       position: fixed;
       top: 25vh;
       left: 5%;
-
       width: 35vw;
       height: 50vh;
-
-      opacity: 0;
-      transition: opacity 1s ease;
       pointer-events: none;
-    }
-
-    .stick-figure.visible {
-      opacity: 1;
     }
 
     .stick-figure svg {
       width: 100%;
       height: 100%;
+      overflow: visible;
+    }
+
+    .figure-line {
+      fill: none;
+      stroke: black;
+      stroke-width: 5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .head {
+      fill: none;
+      stroke: black;
+      stroke-width: 5;
     }
   </style>
 </head>
@@ -66,52 +73,39 @@
     About
   </button>
 
-  <!-- Large stationary stick figure -->
-  <div class="stick-figure" id="stickFigure">
+  <div class="stick-figure">
     <svg viewBox="0 0 200 400"
-         xmlns="http://www.w3.org/2000/svg"
-         preserveAspectRatio="xMidYMid meet">
+         xmlns="http://www.w3.org/2000/svg">
 
-      <!-- Head -->
-      <circle cx="100" cy="55" r="40"
-              fill="none"
-              stroke="black"
-              stroke-width="5"/>
+      <!-- Legs grow from feet to hips -->
+      <path id="leftLeg"
+            class="figure-line"
+            d="M40 380 L100 245"/>
 
-      <!-- Body -->
-      <line x1="100" y1="95"
-            x2="100" y2="245"
-            stroke="black"
-            stroke-width="5"
-            stroke-linecap="round"/>
+      <path id="rightLeg"
+            class="figure-line"
+            d="M160 380 L100 245"/>
 
-      <!-- Left arm -->
-      <line x1="100" y1="140"
-            x2="30" y2="220"
-            stroke="black"
-            stroke-width="5"
-            stroke-linecap="round"/>
+      <!-- Body grows upwards -->
+      <path id="bodyLine"
+            class="figure-line"
+            d="M100 245 L100 95"/>
 
-      <!-- Right arm -->
-      <line x1="100" y1="140"
-            x2="170" y2="220"
-            stroke="black"
-            stroke-width="5"
-            stroke-linecap="round"/>
+      <!-- Arms branch out from body -->
+      <path id="leftArm"
+            class="figure-line"
+            d="M100 140 L30 220"/>
 
-      <!-- Left leg -->
-      <line x1="100" y1="245"
-            x2="40" y2="380"
-            stroke="black"
-            stroke-width="5"
-            stroke-linecap="round"/>
+      <path id="rightArm"
+            class="figure-line"
+            d="M100 140 L170 220"/>
 
-      <!-- Right leg -->
-      <line x1="100" y1="245"
-            x2="160" y2="380"
-            stroke="black"
-            stroke-width="5"
-            stroke-linecap="round"/>
+      <!-- Head grows last -->
+      <circle id="head"
+              class="head"
+              cx="100"
+              cy="55"
+              r="40"/>
     </svg>
   </div>
 
@@ -119,11 +113,33 @@
 
   <script>
     const about = document.getElementById("about");
-    const stickFigure =
-      document.getElementById("stickFigure");
+
+    const parts = {
+      leftLeg: document.getElementById("leftLeg"),
+      rightLeg: document.getElementById("rightLeg"),
+      body: document.getElementById("bodyLine"),
+      leftArm: document.getElementById("leftArm"),
+      rightArm: document.getElementById("rightArm"),
+      head: document.getElementById("head")
+    };
+
+    // Prepare lines for drawing animation
+    const lengths = {};
+
+    for (const [name, element] of Object.entries(parts)) {
+      const length = element.getTotalLength();
+      lengths[name] = length;
+
+      element.style.strokeDasharray = length;
+      element.style.strokeDashoffset = length;
+    }
 
     let currentProgress = 0;
     let targetProgress = 0;
+
+    function clamp(value) {
+      return Math.max(0, Math.min(1, value));
+    }
 
     function updateScroll() {
       const maxScroll =
@@ -131,46 +147,71 @@
         window.innerHeight;
 
       targetProgress = maxScroll > 0
-        ? Math.min(window.scrollY / maxScroll, 1)
+        ? clamp(window.scrollY / maxScroll)
         : 0;
+    }
+
+    // Draw part gradually between two progress points
+    function drawPart(name, progress, start, end) {
+      const amount = clamp(
+        (progress - start) / (end - start)
+      );
+
+      parts[name].style.strokeDashoffset =
+        lengths[name] * (1 - amount);
     }
 
     function animate() {
       currentProgress +=
         (targetProgress - currentProgress) * 0.04;
 
-      // Vertical movement
+      // ABOUT ANIMATION
+      const aboutProgress =
+        clamp(currentProgress / 0.8);
+
       const startY = window.innerHeight - 45;
       const endY = 45;
 
       const y =
-        startY + (endY - startY) * currentProgress;
+        startY + (endY - startY) * aboutProgress;
 
-      // Horizontal movement
       const startX =
         window.innerWidth * 0.375 - 25;
+
       const endX = 45;
 
       const x =
-        startX + (endX - startX) * currentProgress;
+        startX + (endX - startX) * aboutProgress;
 
-      // Font size increase
       const fontSize =
-        18 + 30 * currentProgress;
+        18 + 30 * aboutProgress;
 
       about.style.top = y + "px";
       about.style.left = x + "px";
       about.style.fontSize = fontSize + "px";
 
       about.style.transform =
-        `translateX(${-50 * (1 - currentProgress)}%)`;
+        `translateX(${-50 * (1 - aboutProgress)}%)`;
 
-      // Show stick figure near the top
-      if (currentProgress > 0.97) {
-        stickFigure.classList.add("visible");
-      } else {
-        stickFigure.classList.remove("visible");
-      }
+      // FIGURE GROWTH ANIMATION
+      // Begins after About reaches the top
+      const growth = clamp(
+        (currentProgress - 0.8) / 0.2
+      );
+
+      // 1. Legs grow upwards
+      drawPart("leftLeg", growth, 0.00, 0.35);
+      drawPart("rightLeg", growth, 0.00, 0.35);
+
+      // 2. Body grows upwards
+      drawPart("body", growth, 0.30, 0.65);
+
+      // 3. Arms grow outwards
+      drawPart("leftArm", growth, 0.60, 0.85);
+      drawPart("rightArm", growth, 0.60, 0.85);
+
+      // 4. Head appears last
+      drawPart("head", growth, 0.80, 1.00);
 
       requestAnimationFrame(animate);
     }
