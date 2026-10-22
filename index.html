@@ -9,14 +9,19 @@
   <title>Man Popup</title>
 
   <style>
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
       margin: 0;
       background: white;
       font-family: Arial, sans-serif;
     }
 
+    /* Longer page for slower scrolling */
     .scroll-space {
-      height: 250vh;
+      height: 500vh;
     }
 
     .about-button {
@@ -65,17 +70,18 @@
     }
 
     function animate() {
+      // Smooth movement
       currentProgress +=
-        (targetProgress - currentProgress) * 0.08;
+        (targetProgress - currentProgress) * 0.04;
 
-      // Move from bottom to top
+      // Vertical movement
       const startY = window.innerHeight - 45;
       const endY = 45;
 
       const y =
         startY + (endY - startY) * currentProgress;
 
-      // Move from second section to far left
+      // Horizontal movement
       const startX =
         window.innerWidth * 0.375 - 25;
 
@@ -84,7 +90,7 @@
       const x =
         startX + (endX - startX) * currentProgress;
 
-      // Gradually increase font size
+      // Gradual size increase
       const fontSize =
         18 + (48 - 18) * currentProgress;
 
@@ -92,7 +98,6 @@
       about.style.left = x + "px";
       about.style.fontSize = fontSize + "px";
 
-      // Start centered, finish left-aligned
       about.style.transform =
         `translateX(${-50 * (1 - currentProgress)}%)`;
 
