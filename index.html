@@ -3,51 +3,108 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
   <title>Man Popup</title>
 
   <style>
     body {
       margin: 0;
-      min-height: 100vh;
-      background-color: white;
+      background: white;
       font-family: Arial, sans-serif;
     }
 
-    .bottom-nav {
-      position: fixed;
-      bottom: 20px;
-      left: 0;
-      width: 100%;
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      align-items: center;
+    .scroll-space {
+      height: 250vh;
     }
 
     .about-button {
-      grid-column: 2;
-      justify-self: center;
-      position: relative;
-      left: -25px;
+      position: fixed;
+      top: calc(100vh - 45px);
+      left: calc(37.5% - 25px);
+      transform: translateX(-50%);
+
       background: none;
       border: none;
       padding: 0;
+
       color: black;
       font-size: 18px;
+      font-weight: 400;
       cursor: pointer;
-    }
+      white-space: nowrap;
 
-    .about-button:hover {
-      color: #777;
+      will-change: top, left, font-size;
     }
   </style>
 </head>
 
 <body>
 
-  <nav class="bottom-nav">
-    <button class="about-button">About</button>
-  </nav>
+  <button class="about-button" id="about">
+    About
+  </button>
+
+  <div class="scroll-space"></div>
+
+  <script>
+    const about = document.getElementById("about");
+
+    let currentProgress = 0;
+    let targetProgress = 0;
+
+    function updateScroll() {
+      const maxScroll =
+        document.documentElement.scrollHeight -
+        window.innerHeight;
+
+      targetProgress = maxScroll > 0
+        ? Math.min(window.scrollY / maxScroll, 1)
+        : 0;
+    }
+
+    function animate() {
+      currentProgress +=
+        (targetProgress - currentProgress) * 0.08;
+
+      // Move from bottom to top
+      const startY = window.innerHeight - 45;
+      const endY = 45;
+
+      const y =
+        startY + (endY - startY) * currentProgress;
+
+      // Move from second section to far left
+      const startX =
+        window.innerWidth * 0.375 - 25;
+
+      const endX = 45;
+
+      const x =
+        startX + (endX - startX) * currentProgress;
+
+      // Gradually increase font size
+      const fontSize =
+        18 + (48 - 18) * currentProgress;
+
+      about.style.top = y + "px";
+      about.style.left = x + "px";
+      about.style.fontSize = fontSize + "px";
+
+      // Start centered, finish left-aligned
+      about.style.transform =
+        `translateX(${-50 * (1 - currentProgress)}%)`;
+
+      requestAnimationFrame(animate);
+    }
+
+    window.addEventListener("scroll", updateScroll);
+    window.addEventListener("resize", updateScroll);
+
+    updateScroll();
+    animate();
+  </script>
 
 </body>
 </html>
