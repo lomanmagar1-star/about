@@ -9,6 +9,10 @@
   <title>Man Popup</title>
 
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
       background: white;
@@ -20,12 +24,13 @@
       height: 600vh;
     }
 
-    /* About text */
+    /* ABOUT */
     .about-button {
       position: fixed;
       top: calc(100vh - 45px);
       left: calc(37.5% - 25px);
       transform: translateX(-50%);
+
       background: none;
       border: none;
       padding: 0;
@@ -37,13 +42,15 @@
       z-index: 10;
     }
 
-    /* Large figure on the left */
+    /* STICK FIGURE */
     .stick-figure {
       position: fixed;
       top: 25vh;
       left: 5%;
       width: 35vw;
       height: 50vh;
+
+      opacity: 0;
       pointer-events: none;
     }
 
@@ -60,20 +67,101 @@
       stroke-linecap: round;
       stroke-linejoin: round;
     }
+
+    /* PHOTOGRAPHER INTRODUCTION */
+    .introduction {
+      position: fixed;
+      top: 50%;
+      left: 52%;
+      width: 38%;
+      max-width: 540px;
+
+      transform: translateY(-40%);
+
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+
+      transition:
+        opacity 2s ease,
+        transform 2s ease,
+        visibility 2s;
+    }
+
+    .introduction.visible {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(-50%);
+    }
+
+    .intro-label {
+      font-size: 13px;
+      letter-spacing: 3px;
+      margin-bottom: 25px;
+      color: #555;
+    }
+
+    .intro-title {
+      font-size: clamp(26px, 3vw, 42px);
+      font-weight: 400;
+      line-height: 1.2;
+      margin: 0 0 25px;
+      color: #111;
+    }
+
+    .intro-text {
+      font-size: 16px;
+      line-height: 1.9;
+      color: #444;
+      margin-bottom: 20px;
+    }
+
+    /* MOBILE */
+    @media (max-width: 700px) {
+      .stick-figure {
+        left: 2%;
+        width: 42vw;
+        height: 40vh;
+        top: 30vh;
+      }
+
+      .introduction {
+        left: 48%;
+        width: 48%;
+        max-height: 75vh;
+        overflow-y: auto;
+      }
+
+      .intro-title {
+        font-size: 23px;
+      }
+
+      .intro-text {
+        font-size: 13px;
+        line-height: 1.6;
+      }
+
+      .intro-label {
+        font-size: 10px;
+        letter-spacing: 1px;
+      }
+    }
   </style>
 </head>
 
 <body>
 
+  <!-- About button -->
   <button class="about-button" id="about">
     About
   </button>
 
-  <div class="stick-figure">
+  <!-- Growing stick figure -->
+  <div class="stick-figure" id="stickFigure">
     <svg viewBox="0 0 200 400"
          xmlns="http://www.w3.org/2000/svg">
 
-      <!-- Legs: feet to hips -->
+      <!-- Legs -->
       <path id="leftLeg"
             class="figure-line"
             d="M40 380 L100 245"/>
@@ -82,7 +170,7 @@
             class="figure-line"
             d="M160 380 L100 245"/>
 
-      <!-- Body: hips to neck -->
+      <!-- Body -->
       <path id="bodyLine"
             class="figure-line"
             d="M100 245 L100 95"/>
@@ -103,10 +191,42 @@
     </svg>
   </div>
 
+  <!-- Introduction on the right -->
+  <section class="introduction" id="introduction">
+
+    <div class="intro-label">
+      BEHIND THE LENS
+    </div>
+
+    <h1 class="intro-title">
+      Capturing moments,<br>
+      telling stories.
+    </h1>
+
+    <p class="intro-text">
+      I'm a photographer who believes every moment
+      has a story worth telling. Through my lens,
+      I capture the beauty in everyday life,
+      the emotions we often overlook, and the
+      little details that make every story unique.
+    </p>
+
+    <p class="intro-text">
+      For me, photography isn't just about taking
+      pictures. It's about preserving feelings,
+      creating memories, and seeing the world
+      from a different perspective.
+    </p>
+
+  </section>
+
   <div class="scroll-space"></div>
 
   <script>
     const about = document.getElementById("about");
+    const figure = document.getElementById("stickFigure");
+    const introduction =
+      document.getElementById("introduction");
 
     const parts = {
       leftLeg: document.getElementById("leftLeg"),
@@ -119,7 +239,6 @@
 
     const lengths = {};
 
-    // Hide all figure lines initially
     for (const [name, element] of Object.entries(parts)) {
       const length = element.getTotalLength();
 
@@ -128,28 +247,8 @@
       element.style.strokeDashoffset = length;
     }
 
-    let currentProgress = 0;
-    let targetProgress = 0;
-
-    let growthStarted = false;
-    let growthFinished = false;
-    let growthStartTime = 0;
-    let growthProgress = 0;
-
-    const growthDuration = 3000;
-
     function clamp(value) {
       return Math.max(0, Math.min(1, value));
-    }
-
-    function updateScroll() {
-      const maxScroll =
-        document.documentElement.scrollHeight -
-        window.innerHeight;
-
-      targetProgress = maxScroll > 0
-        ? clamp(window.scrollY / maxScroll)
-        : 0;
     }
 
     function drawPart(name, progress, start, end) {
@@ -162,46 +261,60 @@
     }
 
     function drawFigure(progress) {
-      // Legs grow first
-      drawPart("leftLeg", progress, 0.00, 0.35);
-      drawPart("rightLeg", progress, 0.00, 0.35);
-
-      // Body grows upwards
+      drawPart("leftLeg", progress, 0, 0.35);
+      drawPart("rightLeg", progress, 0, 0.35);
       drawPart("body", progress, 0.30, 0.65);
-
-      // Arms branch out
       drawPart("leftArm", progress, 0.60, 0.85);
       drawPart("rightArm", progress, 0.60, 0.85);
+      drawPart("head", progress, 0.80, 1);
+    }
 
-      // Head grows last
-      drawPart("head", progress, 0.80, 1.00);
+    let currentProgress = 0;
+    let targetProgress = 0;
+
+    let growthStarted = false;
+    let growthFinished = false;
+    let growthStartTime = 0;
+    let growthProgress = 0;
+
+    let figureOpacity = 0;
+    let introShown = false;
+
+    const growthDuration = 3000;
+
+    function updateScroll() {
+      const maxScroll =
+        document.documentElement.scrollHeight -
+        window.innerHeight;
+
+      targetProgress = maxScroll > 0
+        ? clamp(window.scrollY / maxScroll)
+        : 0;
     }
 
     function animate(timestamp) {
-      // Smooth About movement
+
+      // Smooth scrolling
       currentProgress +=
         (targetProgress - currentProgress) * 0.04;
 
+      // About movement
       const aboutProgress =
         clamp(currentProgress / 0.8);
 
-      // About moves bottom to top
       const startY = window.innerHeight - 45;
       const endY = 45;
 
       const y =
         startY + (endY - startY) * aboutProgress;
 
-      // About moves towards left
       const startX =
         window.innerWidth * 0.375 - 25;
-
       const endX = 45;
 
       const x =
         startX + (endX - startX) * aboutProgress;
 
-      // About grows from 18px to 48px
       const fontSize =
         18 + 30 * aboutProgress;
 
@@ -212,7 +325,7 @@
       about.style.transform =
         `translateX(${-50 * (1 - aboutProgress)}%)`;
 
-      // Start automatic growth when About reaches top
+      // Start growth automatically
       if (
         aboutProgress >= 0.999 &&
         !growthStarted &&
@@ -222,12 +335,11 @@
         growthStartTime = timestamp;
       }
 
-      // Animate growth automatically over 3 seconds
+      // Grow stick figure over 3 seconds
       if (growthStarted && !growthFinished) {
-        const elapsed = timestamp - growthStartTime;
-
         growthProgress = clamp(
-          elapsed / growthDuration
+          (timestamp - growthStartTime) /
+          growthDuration
         );
 
         drawFigure(growthProgress);
@@ -238,8 +350,42 @@
         }
       }
 
-      // Reset when scrolling back to beginning
-      if (targetProgress < 0.05) {
+      // Smooth figure fade
+      const shouldShowFigure =
+        targetProgress >= 0.8;
+
+      const targetOpacity =
+        shouldShowFigure ? 1 : 0;
+
+      figureOpacity +=
+        (targetOpacity - figureOpacity) * 0.035;
+
+      figure.style.opacity = figureOpacity;
+
+      // Introduction appears after growth
+      if (
+        growthFinished &&
+        targetProgress >= 0.8 &&
+        !introShown
+      ) {
+        introduction.classList.add("visible");
+        introShown = true;
+      }
+
+      // Introduction disappears on scroll up
+      if (
+        targetProgress < 0.8 &&
+        introShown
+      ) {
+        introduction.classList.remove("visible");
+        introShown = false;
+      }
+
+      // Reset when scrolling back up
+      if (
+        targetProgress < 0.75 &&
+        figureOpacity < 0.01
+      ) {
         growthStarted = false;
         growthFinished = false;
         growthProgress = 0;
