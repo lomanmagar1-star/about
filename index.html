@@ -5,7 +5,6 @@
   <meta charset="UTF-8">
   <meta name="viewport"
         content="width=device-width, initial-scale=1.0">
-
   <title>Man Popup</title>
 
   <style>
@@ -30,7 +29,6 @@
       top: calc(100vh - 45px);
       left: calc(37.5% - 25px);
       transform: translateX(-50%);
-
       background: none;
       border: none;
       padding: 0;
@@ -49,7 +47,6 @@
       left: 5%;
       width: 35vw;
       height: 50vh;
-
       opacity: 0;
       pointer-events: none;
     }
@@ -68,36 +65,36 @@
       stroke-linejoin: round;
     }
 
-    /* PHOTOGRAPHER INTRODUCTION */
+    /* RIGHT-SIDE INTRODUCTION */
     .introduction {
       position: fixed;
-      top: 50%;
-      left: 52%;
+      top: 18vh;
+      right: 7%;
       width: 38%;
       max-width: 540px;
-
-      transform: translateY(-40%);
+      max-height: 78vh;
+      overflow-y: auto;
 
       opacity: 0;
       visibility: hidden;
-      pointer-events: none;
+      transform: translateY(25px);
 
       transition:
-        opacity 2s ease,
-        transform 2s ease,
-        visibility 2s;
+        opacity 1.2s ease,
+        transform 1.2s ease,
+        visibility 1.2s ease;
     }
 
     .introduction.visible {
       opacity: 1;
       visibility: visible;
-      transform: translateY(-50%);
+      transform: translateY(0);
     }
 
     .intro-label {
       font-size: 13px;
       letter-spacing: 3px;
-      margin-bottom: 25px;
+      margin-bottom: 20px;
       color: #555;
     }
 
@@ -105,15 +102,77 @@
       font-size: clamp(26px, 3vw, 42px);
       font-weight: 400;
       line-height: 1.2;
-      margin: 0 0 25px;
+      margin: 0 0 20px;
       color: #111;
     }
 
     .intro-text {
       font-size: 16px;
-      line-height: 1.9;
+      line-height: 1.8;
       color: #444;
-      margin-bottom: 20px;
+      margin: 0 0 18px;
+    }
+
+    /* INTERACTIVE BUTTON SECTION */
+    .intro-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      margin-top: 30px;
+    }
+
+    .button-row {
+      display: grid;
+      grid-template-columns: 150px 1fr;
+      align-items: start;
+      column-gap: 20px;
+    }
+
+    .button-row button {
+      background: none;
+      border: none;
+      padding: 0;
+      color: #111;
+      font-family: inherit;
+      font-size: 17px;
+      font-weight: 400;
+      cursor: pointer;
+      text-align: left;
+      transition: color 0.3s ease;
+    }
+
+    .button-row button:hover {
+      color: #888;
+    }
+
+    .button-row button.active {
+      font-weight: 600;
+    }
+
+    /* Text that appears beside buttons */
+    .button-content {
+      font-size: 14px;
+      line-height: 1.7;
+      color: #555;
+
+      opacity: 0;
+      visibility: hidden;
+      max-height: 0;
+      overflow: hidden;
+      transform: translateX(-10px);
+
+      transition:
+        opacity 0.5s ease,
+        transform 0.5s ease,
+        max-height 0.5s ease,
+        visibility 0.5s ease;
+    }
+
+    .button-content.open {
+      opacity: 1;
+      visibility: visible;
+      max-height: 200px;
+      transform: translateX(0);
     }
 
     /* MOBILE */
@@ -126,10 +185,10 @@
       }
 
       .introduction {
-        left: 48%;
+        top: 17vh;
+        right: 4%;
         width: 48%;
         max-height: 75vh;
-        overflow-y: auto;
       }
 
       .intro-title {
@@ -145,23 +204,35 @@
         font-size: 10px;
         letter-spacing: 1px;
       }
+
+      .button-row {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+
+      .button-row button {
+        font-size: 15px;
+      }
+
+      .button-content {
+        font-size: 12px;
+      }
     }
   </style>
 </head>
 
 <body>
 
-  <!-- About button -->
+  <!-- About -->
   <button class="about-button" id="about">
     About
   </button>
 
-  <!-- Growing stick figure -->
+  <!-- Stick figure -->
   <div class="stick-figure" id="stickFigure">
     <svg viewBox="0 0 200 400"
          xmlns="http://www.w3.org/2000/svg">
 
-      <!-- Legs -->
       <path id="leftLeg"
             class="figure-line"
             d="M40 380 L100 245"/>
@@ -170,12 +241,10 @@
             class="figure-line"
             d="M160 380 L100 245"/>
 
-      <!-- Body -->
       <path id="bodyLine"
             class="figure-line"
             d="M100 245 L100 95"/>
 
-      <!-- Arms -->
       <path id="leftArm"
             class="figure-line"
             d="M100 140 L30 220"/>
@@ -184,14 +253,13 @@
             class="figure-line"
             d="M100 140 L170 220"/>
 
-      <!-- Head -->
       <circle id="head"
               class="head"
               cx="100" cy="55" r="40"/>
     </svg>
   </div>
 
-  <!-- Introduction on the right -->
+  <!-- Introduction -->
   <section class="introduction" id="introduction">
 
     <div class="intro-label">
@@ -218,6 +286,57 @@
       from a different perspective.
     </p>
 
+    <!-- Interactive buttons -->
+    <div class="intro-buttons">
+
+      <div class="button-row">
+        <button type="button"
+                onclick="toggleContent('achievements', this)">
+          Achievements
+        </button>
+        <div class="button-content" id="achievements">
+          A collection of milestones, creative
+          projects, and moments that have shaped
+          my journey as a photographer.
+        </div>
+      </div>
+
+      <div class="button-row">
+        <button type="button"
+                onclick="toggleContent('collaborations', this)">
+          Collaborations
+        </button>
+        <div class="button-content" id="collaborations">
+          Working alongside creative individuals,
+          brands, and artists to bring unique
+          visual stories to life.
+        </div>
+      </div>
+
+      <div class="button-row">
+        <button type="button"
+                onclick="toggleContent('button3', this)">
+          Button 3
+        </button>
+        <div class="button-content" id="button3">
+          This is a placeholder for future
+          information, projects, or photography
+          experiences.
+        </div>
+      </div>
+
+      <div class="button-row">
+        <button type="button"
+                onclick="toggleContent('button4', this)">
+          Button 4
+        </button>
+        <div class="button-content" id="button4">
+          More creative content and personal
+          stories will be added here soon.
+        </div>
+      </div>
+
+    </div>
   </section>
 
   <div class="scroll-space"></div>
@@ -227,6 +346,25 @@
     const figure = document.getElementById("stickFigure");
     const introduction =
       document.getElementById("introduction");
+
+    /* BUTTON TOGGLE FUNCTION */
+    function toggleContent(id, button) {
+      const content = document.getElementById(id);
+      const wasOpen = content.classList.contains("open");
+
+      // Close all other content
+      document.querySelectorAll(".button-content")
+        .forEach(item => item.classList.remove("open"));
+
+      document.querySelectorAll(".button-row button")
+        .forEach(item => item.classList.remove("active"));
+
+      // Open selected content, or leave closed
+      if (!wasOpen) {
+        content.classList.add("open");
+        button.classList.add("active");
+      }
+    }
 
     const parts = {
       leftLeg: document.getElementById("leftLeg"),
@@ -275,12 +413,9 @@
     let growthStarted = false;
     let growthFinished = false;
     let growthStartTime = 0;
-    let growthProgress = 0;
-
     let figureOpacity = 0;
-    let introShown = false;
 
-    const growthDuration = 3000;
+    const growthDuration = 1500;
 
     function updateScroll() {
       const maxScroll =
@@ -293,12 +428,9 @@
     }
 
     function animate(timestamp) {
-
-      // Smooth scrolling
       currentProgress +=
         (targetProgress - currentProgress) * 0.04;
 
-      // About movement
       const aboutProgress =
         clamp(currentProgress / 0.8);
 
@@ -325,70 +457,57 @@
       about.style.transform =
         `translateX(${-50 * (1 - aboutProgress)}%)`;
 
-      // Start growth automatically
+      // Start figure growth
       if (
         aboutProgress >= 0.999 &&
         !growthStarted &&
-        !growthFinished
+        !growthFinished &&
+        targetProgress >= 0.8
       ) {
         growthStarted = true;
         growthStartTime = timestamp;
       }
 
-      // Grow stick figure over 3 seconds
       if (growthStarted && !growthFinished) {
-        growthProgress = clamp(
+        const growth = clamp(
           (timestamp - growthStartTime) /
           growthDuration
         );
 
-        drawFigure(growthProgress);
+        drawFigure(growth);
 
-        if (growthProgress >= 1) {
+        if (growth >= 1) {
           growthFinished = true;
           growthStarted = false;
         }
       }
 
-      // Smooth figure fade
-      const shouldShowFigure =
-        targetProgress >= 0.8;
-
+      // Fade figure
       const targetOpacity =
-        shouldShowFigure ? 1 : 0;
+        targetProgress >= 0.8 ? 1 : 0;
 
       figureOpacity +=
         (targetOpacity - figureOpacity) * 0.035;
 
       figure.style.opacity = figureOpacity;
 
-      // Introduction appears after growth
+      // Fade introduction after growth
       if (
         growthFinished &&
-        targetProgress >= 0.8 &&
-        !introShown
+        targetProgress >= 0.8
       ) {
         introduction.classList.add("visible");
-        introShown = true;
-      }
-
-      // Introduction disappears on scroll up
-      if (
-        targetProgress < 0.8 &&
-        introShown
-      ) {
+      } else {
         introduction.classList.remove("visible");
-        introShown = false;
       }
 
-      // Reset when scrolling back up
+      // Reset when scrolling up
       if (
         targetProgress < 0.75 &&
         figureOpacity < 0.01
       ) {
         growthStarted = false;
         growthFinished = false;
-        growthProgress = 0;
         drawFigure(0);
       }
 
